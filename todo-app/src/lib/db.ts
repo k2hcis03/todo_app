@@ -1,5 +1,7 @@
 import { MongoClient, type Db } from 'mongodb';
 
+const DEFAULT_DB_NAME = 'todo_app';
+
 interface MongoCache {
   client?: Promise<MongoClient>;
   indexed?: Promise<void>;
@@ -30,10 +32,9 @@ export async function ensureIndexes(db: Db): Promise<void> {
 /** 앱 서버에서 쓰는 Db 핸들. 환경 변수는 호출 시점에 읽으므로 빌드 단계에서는 연결하지 않는다. */
 export async function getDb(): Promise<Db> {
   const uri = process.env.MONGODB_URI;
-  const dbName = process.env.MONGODB_DB;
-  if (!uri || !dbName) {
-    throw new Error('MONGODB_URI와 MONGODB_DB 환경 변수가 필요합니다 (.env.example 참고)');
-  }
+  if (!uri) throw new Error('MONGODB_URI 환경 변수가 필요합니다 (.env.example 참고)');
+  // DB 이름을 빼먹은 배포 때문에 모든 요청(로그인 포함)이 500으로 깨지지 않도록 기본값을 둔다.
+  const dbName = process.env.MONGODB_DB || DEFAULT_DB_NAME;
 
   cache.client ??= MongoClient.connect(uri).catch((error) => {
     // 실패한 연결을 캐시하면 서버를 재시작할 때까지 복구되지 않는다.

@@ -23,7 +23,7 @@ npm run dev                  # http://localhost:3000
 | 이름 | 설명 | 예시 |
 |---|---|---|
 | `MONGODB_URI` | MongoDB 연결 문자열 | `mongodb://127.0.0.1:27017` 또는 Atlas의 `mongodb+srv://...` |
-| `MONGODB_DB` | 사용할 데이터베이스 이름 | `todo_app` |
+| `MONGODB_DB` | 사용할 데이터베이스 이름 (생략하면 `todo_app`) | `todo_app` |
 | `GITHUB_CLIENT_ID` | GitHub OAuth App의 Client ID | GitHub에서 발급 |
 | `GITHUB_CLIENT_SECRET` | GitHub OAuth App의 Client secret. **소스에 적지 말고 환경 변수로만 둡니다.** | GitHub에서 발급 |
 
