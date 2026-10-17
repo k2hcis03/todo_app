@@ -1,0 +1,26 @@
+[US-001] Next.js 16.4.2 + React 19.3 + vitest 5 스캐폴드 완료 (앱은 ch4/todo-app/).
+- 학습: params는 Promise, RouteContext 헬퍼 전역. node_modules/next/dist/docs 참고.
+- 학습: vitest 5는 @types/node ^24 필요(설치 시 ^24로 상향).
+- 학습: omc ralph verify는 출력 전체를 서명으로 쓰므로 테스트는 TAP 리포터(npm run test:ci)로 돌려야 안정적.
+- 학습: OMC 상태 루트가 C:\Users\k2hci\.omc (git 저장소 아님). PRD/베이스라인은 거기 있음. 완료 처리: node C:/Users/k2hci/.omc/ralph-mark.mjs
+[US-002~004] 도메인(progress/schemas), DB 계층(repo/*, db.ts), REST API(app/api/**) 완료. vitest 50개 통과.
+- 학습: next.config에 cacheComponents:true. 핸들러는 await connection()으로 요청 시점 실행 고정(lib/api.ts handle).
+- 학습: omc ralph verify는 출력 줄을 서명으로 쓰므로 scripts/quiet.mjs로 build/test를 감싸 성공 시 무출력. PRD feedbackCommands = verify:build, lint, verify:test.
+- 결정: 상태/주간 변경 시 카드는 이동한 컬럼 맨 아래(order=max+1). 삭제는 하위→상위 순 연쇄.
+[US-005~008] UI(GoalPanel/WeekPanel/Board/TodoForm), dnd-kit(포인터+키보드), E2E 8개, README 완료.
+- 학습: dnd-kit KeyboardSensor는 시작 후 setTimeout으로 keydown 리스너를 붙임 → E2E는 라이브 리전 안내 문구로 단계 대기.
+- 학습: cacheComponents에서 렌더 중 new Date()는 사전 렌더링과 충돌 → ClientOnly 래퍼.
+- 학습: Playwright 개발 서버 모드는 127.0.0.1 교차 출처로 하이드레이션 차단 → E2E 기본은 next build/start.
+- 미구현: P1(목표 진행률 집계, 기간별 보기, 계층 트리, 컬럼 내 순서 변경) — plan.md 단계 9, 별도 승인.
+
+=== GitHub OAuth 작업 (docs/LOGIN.md, PRD 세션 ralph-github-oauth) ===
+[US-101] lib/auth/{config,github,session,users,collections}.ts 완료. 세션 토큰은 SHA-256 해시만 저장, TTL 인덱스+조회 시 만료 직접 비교.
+- 발견: ch4/.env의 GITHUB_CLIENT_ID가 8자이고 토큰 엔드포인트가 Not Found 응답 → 잘못된 값으로 추정(사용자명일 가능성). 실제 로그인 확인은 사용자 조치 필요. 테스트는 가짜 GitHub로 진행.
+- 결정: 'CRUD 로직 변경 금지' = 동작·API 계약 유지, 소유자(userId) 조건만 추가하는 최소 변경으로 해석.
+[US-102] /auth/github, /auth/github/callback, /auth/logout, /api/me 완료. state 대조·Origin 검사는 변이 검증으로 테스트 민감도 확인.
+[US-103/104] 소유권(userId 전 쿼리 범위)·API 401/404/403·마이그레이션 스크립트 완료. 학습: 변이 검증이 문법을 깨뜨리면 'no tests'로 나와 무효 — 반드시 node --check 후 결과 해석.
+[US-105] AuthGate(/api/me 기준)·LoginScreen·UserBar·401 이벤트로 세션 만료 전환·로그아웃 시 SWR 캐시 전체 삭제. avatar_url은 http(s)만 허용.
+[US-106 진행] .env.example·README 가이드, 가짜 GitHub 서버(scripts/fake-github.mjs)+E2E 18개(72/72 반복 통과), 하드코딩 비밀 검색 클린.
+- 실제 결함 발견·수정: 콜백이 request.url로 절대 주소 리다이렉트 → 127.0.0.1 접속 시 localhost로 보내져 쿠키가 안 붙음. 상대 Location(redirectLocal)으로 수정. 단위 테스트는 localhost만 써서 못 잡았고 브라우저 E2E가 잡음.
+- 차단: .env의 GITHUB_CLIENT_ID가 OAuth App Client ID가 아니라 사용자명(8자)으로 보임. 토큰 엔드포인트 점검 'Not Found'. 실제 GitHub 승인 기준(US-106 4번)은 사용자가 올바른 값을 넣기 전까지 검증 불가 → 약화하지 않고 미완으로 남김.
+- 학습: 테스트에서 getByText 부분일치/role=alert 중복/로그아웃 버튼명 부분일치로 로케이터 충돌 → exact 사용. 반복 실행(--repeat-each)으로 상태 의존 테스트를 잡을 것.
