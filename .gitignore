@@ -1,2 +1,10 @@
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 /graft/
+
+# 비밀 값: 환경 변수 파일은 절대 커밋하지 않는다 (자리 표시자만 든 .env.example은 예외)
+.env
+.env.*
+!.env.example
+
+# OMC(오케스트레이션) 도구 상태 — 세션마다 바뀌는 로컬 상태라 커밋하지 않는다
+.omc/
